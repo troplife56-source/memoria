@@ -1,0 +1,50 @@
+.contact-card {
+    background-color: #f0fdf4;
+    border: 2px solid #86efac;
+    text-align: left;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-info h3 {
+    color: #166534;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.contact-info p {
+    color: #15803d;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-call, .btn-phone, .btn-whatsapp {
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-call { background-color: #16a34a; }
+.btn-phone { background-color: #2563eb; }
+.btn-whatsapp { background-color: #25D366; }
+
+.btn-call:hover { background-color: #15803d; }
+.btn-phone:hover { background-color: #1d4ed8; }
+.btn-whatsapp:hover { background-color: #1ebd56; }
