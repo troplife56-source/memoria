@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Compagnon de Jour - Complet</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #4b5563;
+            --accent: #2563eb;
+        }
+
+        body.night-mode {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent: #60a5fa;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        h1 {
+            color: var(--text-sub);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.5s;
+        }
+
+        #time-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        #date-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        #moment-display {
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            margin-top: 10px;
+        }
+
+        .reassurance-card {
+            background-color: var(--card-bg);
+            border: 2px solid #93c5fd;
+        }
+
+        .reassurance-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* --- Section Jeux --- */
+        .games-card {
+            background-color: var(--card-bg);
+            border: 2px solid #ec4899;
+            text-align: left;
+        }
+
+        .games-card h3 {
+            color: #db2777;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-game {
+            background-color: #f472b6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-game:hover { background-color: #db2777; }
+
+        /* Modal des mini-jeux et albums */
+        .game-modal, .album-modal {
+            display: none;
+            background: rgba(0,0,0,0.8);
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .game-content, .album-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .album-gallery {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 15px 0;
+        }
+        .album-gallery img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+        }
+
+        /* --- Section Proches --- */
+        .contacts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-card {
+            background-color: var(--card-bg);
+            border: 2px solid #86efac;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .contact-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #16a34a;
+        }
+
+        .contact-info h3 {
+            color: #16a34a;
+            font-size: 1.3rem;
+            margin-bottom: 3px;
+        }
+
+        .contact-bio {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            background: rgba(0,0,0,0.02);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #16a34a;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-delete-contact {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        /* --- Boutons Généraux --- */
+        .btn-call, .btn-phone, .btn-whatsapp, .btn-planning, .btn-memory, .btn-album {
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-call { background-color: #16a34a; }
+        .btn-phone { background-color: #2563eb; }
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-memory { background-color: #0d9488; }
+        .btn-album { background-color: #9333ea; }
+        .btn-planning { background-color: #ca8a04; width: 100%; justify-content: center; margin-top: 15px; }
+
+        .btn-emergency {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-action {
+            background-color: var(--accent);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 20px 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn-fullscreen {
+            background: none;
+            border: 1px solid var(--text-sub);
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        /* --- Espace Aidant --- */
+        .admin-bar {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 40px auto 10px auto;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .admin-bar summary { cursor: pointer; font-weight: bold; color: var(--text-sub); }
+        .admin-content { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+        .admin-content label { font-weight: bold; font-size: 0.85rem; color: var(--text-sub); }
+        .admin-content input, .admin-content textarea, .admin-content select {
+            padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; width: 100%; background: var(--card-bg); color: var(--text-main);
+        }
+        .btn-save { background-color: #16a34a; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; align-self: flex-start; }
+    </style>
+</head>
+<body>
+
+    <button class="btn-fullscreen" id="fullscreen-btn">🖥️ Mode Plein Écran</button>
+    <h1>Mon Compagnon Quotidien</h1>
+
+    <div class="card">
+        <div id="time-display">00:00:00</div>
+        <div id="date-display">Chargement...</div>
+        <div id="moment-display">--</div>
+    </div>
+
+    <!-- Bouton d'urgence -->
+    <a href="tel:112" class="btn-emergency">🚨 Appel d'urgence (Secours 112)</a>
+
+    <div class="card reassurance-card">
+        <p class="reassurance-text" id="status-message">Tout va bien, vous êtes chez vous en toute sécurité.</p>
+    </div>
+
+    <!-- Rubrique Jeux & Mémoire Intégrés -->
+    <div class="card games-card">
+        <h3>🎮 Espace Jeux & Mémoire</h3>
+        <p style="font-size: 0.95rem; color: var(--text-sub);">Exercez votre mémoire avec les photos de vos proches.</p>
+        <div class="games-grid">
+            <button class="btn-game" id="start-memory-btn">🧠 Jeu des Paires</button>
+            <button class="btn-game" id="start-quiz-btn">❓ Quiz des Souvenirs</button>
+        </div>
+    </div>
+
+    <!-- Modal pour les jeux intégrés -->
+    <div id="game-modal" class="game-modal">
+        <div class="game-content">
+            <h2 id="game-title" style="color: #db2777; margin-bottom: 15px;">Jeu</h2>
+            <div id="game-body" style="margin: 20px 0; font-size: 1.1rem;"></div>
+            <button class="btn-save" id="close-game-btn" style="background-color: #475569; width:100%; justify-content:center;">Fermer le jeu</button>
+        </div>
+    </div>
+
+    <!-- Modal Album Photo -->
+    <div id="album-modal" class="album-modal">
+        <div class="album-content">
+            <h2 id="album-modal-title" style="color: var(--accent); margin-bottom: 10px;">Album Souvenirs</h2>
+            <div class="album-gallery" id="album-modal-gallery"></div>
+            <button class="btn-save" id="close-album-btn" style="background-color: #475569; width:100%; justify-content:center; margin-top:15px;">Fermer l'album</button>
+        </div>
+    </div>
+
+    <!-- Espace Proches -->
+    <div class="contacts-container" id="display-contacts-container"></div>
+
+    <!-- Planning -->
+    <div class="card planning-card">
+        <h3>📅 Rappels du jour</h3>
+        <div class="planning-content" id="display-planning">Chargement...</div>
+        <button class="btn-planning" id="speak-planning-btn">🔊 Lire le planning</button>
+    </div>
+
+    <div>
+        <button class="btn-action" id="speak-btn">🔊 Rappeler où je suis</button>
+    </div>
+
+    <!-- Espace Aidant -->
+    <details class="admin-bar">
+        <summary>⚙️ Espace Aidant & Réglages</summary>
+        <div class="admin-content">
+            <label for="speech-rate-select">Vitesse de la voix :</label>
+            <select id="speech-rate-select">
+                <option value="0.8">Lente</option>
+                <option value="1" selected>Normale</option>
+                <option value="1.2">Rapide</option>
+            </select>
+            <button class="btn-save" id="save-voice-btn">💾 Enregistrer</button>
+
+            <hr style="border:0; border-top:1px solid #cbd5e1; margin: 10px 0;">
+
+            <label>👥 Ajouter un proche :</label>
+            <input type="text" id="new-contact-name" placeholder="Nom et lien (ex: Sarah - Fille)">
+            <input type="text" id="new-contact-phone" placeholder="Téléphone">
+            <input type="text" id="new-contact-photo" placeholder="URL Photo de profil" value="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150">
+            <textarea id="new-contact-bio" rows="2" placeholder="Message souvenir..."></textarea>
+            <label>Photos d'album (URLs séparées par des virgules) :</label>
+            <input type="text" id="new-contact-album" placeholder="https://img1.jpg, https://img2.jpg">
+            <button class="btn-save" id="add-contact-btn">➕ Ajouter</button>
+
+            <hr style="border:0; border-top:1px solid #cbd5e1; margin: 10px 0;">
+
+            <label for="calendar-date-picker">📅 Choisir une date pour l'agenda :</label>
+            <input type="date" id="calendar-date-picker" style="padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;">
+
+            <label for="selected-day-input">Rappels pour cette date :</label>
+            <textarea id="selected-day-input" rows="3" placeholder="Ex: 10h - Docteur / 14h - Médicaments"></textarea>
+
+            <button class="btn-save" id="save-day-btn">💾 Enregistrer les rappels du jour</button>
+        </div>
+    </details>
+
+    <script>
+        let contactsList = JSON.parse(localStorage.getItem('companion_contacts_list')) || [
+            { 
+                name: "Sarah (Fille)", 
+                phone: "0612345678", 
+                photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150", 
+                bio: "C'est ta fille Sarah.",
+                album: ["https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300"]
+            }
+        ];
+        let eventsDb = JSON.parse(localStorage.getItem('companion_events_db')) || {};
+        let userSpeechRate = parseFloat(localStorage.getItem('companion_speech_rate')) || 1.0;
+        document.getElementById('speech-rate-select').value = userSpeechRate;
+
+        const todayObj = new Date();
+        const todayIso = todayObj.toISOString().split('T')[0];
+        document.getElementById('calendar-date-picker').value = todayIso;
+
+        function loadAppData() {
+            renderContacts();
+            updateTodayPlanning();
+            updateClock(); // Synchro immédiate de l'heure et de la date
+        }
+
+        // --- Horloge & Mode Nuit ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('time-display').textContent = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('date-display').textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            const currentHour = now.getHours();
+            if (currentHour >= 21 || currentHour < 6) {
+                document.body.classList.add('night-mode');
+                document.getElementById('moment-display').textContent = "Nuit 🌙";
+                document.getElementById('status-message').textContent = "Il fait nuit, tout est calme. Vous pouvez vous reposer en toute sécurité.";
+            } else {
+                document.body.classList.remove('night-mode');
+                document.getElementById('moment-display').textContent = currentHour < 12 ? "Matin ☀️" : (currentHour < 18 ? "Après-midi 🌤️" : "Soirée 🌙");
+            }
+        }
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // --- Affichage sécurisé des proches ---
+        function renderContacts() {
+            const container = document.getElementById('display-contacts-container');
+            container.innerHTML = '';
+            
+            contactsList.forEach((contact, index) => {
+                const cleanPhone = contact.phone.replace(/\s+/g, '');
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                card.innerHTML = `
+                    <div class="contact-header">
+                        <img src="${contact.photo}" alt="${contact.name}" class="contact-avatar">
+                        <div class="contact-info">
+                            <h3>👤 ${contact.name}</h3>
+                            <p>Téléphone : ${contact.phone}</p>
+                        </div>
+                    </div>
+                    ${contact.bio ? `<div class="contact-bio">💬 ${contact.bio}</div>` : ''}
+                    <div class="contact-actions">
+                        <div>
+                            <button class="btn-memory" id="speak-contact-${index}">🔊 Écouter</button>
+                            <button class="btn-album" id="album-contact-${index}">📸 Album</button>
+                            <a href="tel:${cleanPhone}" class="btn-phone">📞 Appeler</a>
+                        </div>
+                        <button class="btn-delete-contact" id="delete-contact-${index}">🗑️ Supprimer</button>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                document.getElementById(`speak-contact-${index}`).addEventListener('click', () => {
+                    speakText(`C'est ${contact.name}. ${contact.bio || ''} Tu peux l'appeler au ${contact.phone}.`);
+                });
+
+                document.getElementById(`album-contact-${index}`).addEventListener('click', () => {
+                    openAlbum(contact.name, contact.album || []);
+                });
+
+                document.getElementById(`delete-contact-${index}`).addEventListener('click', () => {
+                    deleteContact(index);
+                });
+            });
+        }
+
+        // --- Gestion Album ---
+        function openAlbum(name, albumArray) {
+            const modal = document.getElementById('album-modal');
+            const title = document.getElementById('album-modal-title');
+            const gallery = document.getElementById('album-modal-gallery');
+
+            title.textContent = `Album Souvenirs de ${name}`;
+            gallery.innerHTML = '';
+
+            if (albumArray && albumArray.length > 0) {
+                albumArray.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url.trim();
+                    gallery.appendChild(img);
+                });
+            } else {
+                gallery.innerHTML = "<p>Aucune photo dans cet album.</p>";
+            }
+            modal.style.display = 'flex';
+        }
+
+        document.getElementById('close-album-btn').addEventListener('click', () => {
+            document.getElementById('album-modal').style.display = 'none';
+        });
+
+        // --- Gestion Agenda ---
+        document.getElementById('calendar-date-picker').addEventListener('change', function() {
+            const selectedIso = this.value;
+            const [y, m, d] = selectedIso.split('-');
+            const formattedKey = `${d}/${m}/${y}`;
+            document.getElementById('selected-day-input').value = eventsDb[formattedKey] || "";
+        });
+
+        document.getElementById('save-day-btn').addEventListener('click', function() {
+            const selectedIso = document.getElementById('calendar-date-picker').value;
+            if (selectedIso) {
+                const [y, m, d] = selectedIso.split('-');
+                const formattedKey = `${d}/${m}/${y}`;
+                eventsDb[formattedKey] = document.getElementById('selected-day-input').value;
+                localStorage.setItem('companion_events_db', JSON.stringify(eventsDb));
+                updateTodayPlanning();
+                alert("Rappels de la date enregistrés !");
+            }
+        });
+
+        function updateTodayPlanning() {
+            const now = new Date();
+            const todayKey = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            const planningDisplay = document.getElementById('display-planning');
+            planningDisplay.textContent = eventsDb[todayKey] || "Aucun rappel particulier prévu aujourd'hui. Profitez de votre journée !";
+        }
+
+        const initialKey = `${String(todayObj.getDate()).padStart(2, '0')}/${String(todayObj.getMonth() + 1).padStart(2, '0')}/${todayObj.getFullYear()}`;
+        document.getElementById('selected-day-input').value = eventsDb[initialKey] || "";
+
+        // --- Moteur des Jeux Intégrés ---
+        document.getElementById('start-memory-btn').addEventListener('click', startMemoryGame);
+        document.getElementById('start-quiz-btn').addEventListener('click', startQuizGame);
+        document.getElementById('close-game-btn').addEventListener('click', () => {
+            document.getElementById('game-modal').style.display = 'none';
+        });
+
+        function openGameModal() {
+            document.getElementById('game-modal').style.display = 'flex';
+        }
+
+        function startMemoryGame() {
+            openGameModal();
+            document.getElementById('game-title').textContent = "🧠 Jeu des Paires (Mémoire)";
+            const body = document.getElementById('game-body');
+
+            if (contactsList.length === 0) {
+                body.innerHTML = "<p>Veuillez d'abord ajouter des proches dans l'espace aidant !</p>";
+                return;
+            }
+
+            const target = contactsList[Math.floor(Math.random() * contactsList.length)];
+            body.innerHTML = `
+                <p>Retrouvez la photo de <strong>${target.name}</strong> parmi ces cartes :</p>
+                <div style="display:flex; justify-content:center; gap:15px; margin-top:20px; flex-wrap:wrap;" id="memory-cards"></div>
+                <p id="memory-result" style="margin-top:15px; font-weight:bold;"></p>
+            `;
+
+            const cardsContainer = document.getElementById('memory-cards');
+            let choices = [target];
+            contactsList.forEach(c => { if (c.name !== target.name && !choices.includes(c)) choices.push(c); });
+            choices.sort(() => Math.random() - 0.5);
+
+            choices.forEach(c => {
+                const img = document.createElement('img');
+                img.src = c.photo;
+                img.style.width = "90px";
+                img.style.height = "90px";
+                img.style.objectFit = "cover";
+                img.style.borderRadius = "8px";
+                img.style.cursor = "pointer";
+                img.style.border = "3px solid #cbd5e1";
+
+                img.onclick = () => {
+                    const res = document.getElementById('memory-result');
+                    if (c.name === target.name) {
+                        res.style.color = "#16a34a";
+                        res.textContent = `🎉 Bravo ! C'est bien ${target.name}.`;
+                        speakText(`Bravo ! C'est bien ${target.name}.`);
+                    } else {
+                        res.style.color = "#dc2626";
+                        res.textContent = "❌ Ce n'est pas la bonne personne, essayez encore !";
+                    }
+                };
+                cardsContainer.appendChild(img);
+            });
+        }
+
+        function startQuizGame() {
+            openGameModal();
+            document.getElementById('game-title').textContent = "❓ Quiz des Souvenirs";
+            const body = document.getElementById('game-body');
+
+            if (contactsList.length === 0) {
+                body.innerHTML = "<p>Veuillez d'abord ajouter des proches dans l'espace aidant !</p>";
+                return;
+            }
+
+            const target = contactsList[Math.floor(Math.random() * contactsList.length)];
+            body.innerHTML = `
+                <p><strong>Qui est cette personne ?</strong></p>
+                <img src="${target.photo}" style="width:100px; height:100px; object-fit:cover; border-radius:50%; margin:10px auto; border:3px solid #2563eb; display:block;">
+                <div id="quiz-choices" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
+                <p id="quiz-result" style="margin-top:15px; font-weight:bold;"></p>
+            `;
+
+            const choicesContainer = document.getElementById('quiz-choices');
+            let options = [target.name];
+            contactsList.forEach(c => { if (c.name !== target.name && !options.includes(c.name)) options.push(c.name); });
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-game';
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    const res = document.getElementById('quiz-result');
+                    if (opt === target.name) {
+                        res.style.color = "#16a34a";
+                        res.textContent = `🎉 Excellente réponse ! C'est ${target.name}.`;
+                        speakText(`Excellente réponse ! C'est ${target.name}.`);
+                    } else {
+                        res.style.color = "#dc2626";
+                        res.textContent = "❌ Oups, ce n'est pas ça. Essayez une autre réponse !";
+                    }
+                };
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        // --- Ajout de proche ---
+        document.getElementById('add-contact-btn').addEventListener('click', function() {
+            const name = document.getElementById('new-contact-name').value.trim();
+            const phone = document.getElementById('new-contact-phone').value.trim();
+            const photo = document.getElementById('new-contact-photo').value.trim();
+            const bio = document.getElementById('new-contact-bio').value.trim();
+            const albumInput = document.getElementById('new-contact-album').value.trim();
+
+            if (!name || !phone) return alert("Remplissez au moins le nom et le téléphone.");
+
+            const albumArray = albumInput ? albumInput.split(',').map(url => url.trim()) : [];
+            contactsList.push({ name, phone, photo: photo || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150", bio, album: albumArray });
+            localStorage.setItem('companion_contacts_list', JSON.stringify(contactsList));
+
+            document.getElementById('new-contact-name').value = '';
+            document.getElementById('new-contact-phone').value = '';
+            document.getElementById('new-contact-bio').value = '';
+            document.getElementById('new-contact-album').value = '';
+
+            renderContacts();
+            alert("Proche et album ajoutés avec succès !");
+        });
+
+        function deleteContact(index) {
+            contactsList.splice(index, 1);
+            localStorage.setItem('companion_contacts_list', JSON.stringify(contactsList));
+            renderContacts();
+        }
+
+        document.getElementById('save-voice-btn').addEventListener('click', function() {
+            userSpeechRate = parseFloat(document.getElementById('speech-rate-select').value);
+            localStorage.setItem('companion_speech_rate', userSpeechRate);
+            alert("Réglage vocal enregistré !");
+        });
+
+        loadAppData();
+
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        });
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = 'fr-FR';
+                speech.rate = userSpeechRate;
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        document.getElementById('speak-btn').addEventListener('click', () => speakText(document.getElementById('status-message').textContent));
+        document.getElementById('speak-planning-btn').addEventListener('click', () => speakText("Voici les rappels du jour : " + document.getElementById('display-planning').textContent));
+    </script>
+</body>
+</html>
